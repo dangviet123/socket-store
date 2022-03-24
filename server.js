@@ -34,12 +34,12 @@ io.on('connection', (socket) => {
 
         // tất cả user online khi người dùng đăng nhập
         socket.emit('all-user-online', Object.keys(clients));
-        socket.broadcast.emit('user-login', id);
+        socket.broadcast.emit('user-login', Object.keys(clients));
 
         // user đóng kết nối
         socket.on("disconnect", () => {
             clients = removeSocketIdToArray(clients, id, socket);
-            socket.broadcast.emit('user-logout', id);
+            socket.broadcast.emit('user-logout', Object.keys(clients));
 
             console.log('người dùng đóng kết nối');
 
