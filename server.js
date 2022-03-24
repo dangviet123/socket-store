@@ -23,36 +23,23 @@ app.get('/', (req, res) => {
 });
 let clients = {};
 app.use(cors());
-
-io.use(function (socket, next) { // check token
-    if (socket.handshake.query && socket.handshake.query.token) { // check token gửi lên
-        jwt.verify(socket.handshake.query.token, 'icGrWBMIsJN5FdAvELTvaAks0drAvnDgyYb50s3fmkrgFSziBT8Jo0wBvoVvJ4W9', function (err, decoded) {
-            if (err) return next(new Error('Xác thực lỗi'));
-            socket.decoded = decoded;
-            next();
-        });
-    }
-    else {
-        next(new Error('Xác thực lỗi'));
-    }
-}).on('connection', (socket) => {
-
-    try {
-        console.log('người dùng connect');
-        const user = socket.decoded;
-        if (user) {
-            clients = pushSocketIdToArray(clients, user.sub, socket.id);
+io.on('connection', (socket) => {
+    
+    try {   
+        let id = socket.handshake.query.id;
+        if (id) {
+            clients = pushSocketIdToArray(clients, id, socket.id);
             //console.log(clients);
         }
 
         // tất cả user online khi người dùng đăng nhập
         socket.emit('all-user-online', Object.keys(clients));
-        socket.broadcast.emit('user-login', user.sub);
+        socket.broadcast.emit('user-login', id);
 
         // user đóng kết nối
         socket.on("disconnect", () => {
-            clients = removeSocketIdToArray(clients, user.sub, socket);
-            socket.broadcast.emit('user-logout', user.sub);
+            clients = removeSocketIdToArray(clients, id, socket);
+            socket.broadcast.emit('user-logout', id);
 
             console.log('người dùng đóng kết nối');
 
