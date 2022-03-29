@@ -14,8 +14,7 @@
 </body>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    var token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvZW9mZmljZS5tZXJhcGdyb3VwLmNvbVwvZW9mZmljZVwvYXBpXC9hcGlcL2Vjb21tZXJjZVwvYXV0aFwvbG9naW4iLCJpYXQiOjE2NDY2Njc0ODksImV4cCI6MTY0OTI5NTQ4OSwibmJmIjoxNjQ2NjY3NDg5LCJqdGkiOiJlM3NyajcxU1o1ckRTMk90Iiwic3ViIjoxNDA2LCJwcnYiOiIxZDBhMDIwYWNmNWM0YjZjNDk3OTg5ZGYxYWJmMGZiZDRlOGM4ZDYzIn0.E4gQAonvVy9aarAgRjGtuj1zzsoOeYsK9OEwSZfrEsY';
-    var socket = io({ query: 'token=' + token });
+    var socket = io({ query: `id=1&full_name=IT test`, });
 
     var form = document.getElementById('form');
     var input = document.getElementById('input');
