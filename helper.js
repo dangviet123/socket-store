@@ -8,13 +8,12 @@ const pushSocketIdToArray = (clients, userId, socketId) => {
 }
 
 const pushSocketIdToArrayInfo = (clients, userId, socketId, infos) => {
-  if (userId > 0) {
     if(clients[userId]){
         clients[userId].push({
           socketId: socketId,
           date: new Date(),
           full_name: infos.query.full_name,
-          headers: infos.headers
+          headers: infos.headers['user-agent']
         });
     }else{
         clients[userId] = [
@@ -22,12 +21,11 @@ const pushSocketIdToArrayInfo = (clients, userId, socketId, infos) => {
             socketId: socketId,
             date: new Date(),
             full_name: infos.query.full_name,
-            headers: infos.headers
+            headers: infos.headers['user-agent']
           }
         ];
     }
     return clients;
-  }
 }
 
 const removeSocketIdToArrayInfo = (clients, userId, socket, headers)=>{

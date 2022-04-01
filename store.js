@@ -16,27 +16,31 @@ const storeSocket = (io) => {
     let meeting = io.of("/store");
     meeting.on('connection', (socket) => {
         try {   
-            let id = socket.handshake.query.id;
-            if (id) {
-                clients = pushSocketIdToArray(clients, id, socket.id);
-                clientsInfo = pushSocketIdToArrayInfo(clientsInfo, id, socket.id, socket.handshake);
-            }
-            socket.emit('all-user-online', Object.keys(clients));
+                let id = socket.handshake.query.id;
+                if (id !== 0) {
+                    clients = pushSocketIdToArray(clients, id, socket.id);
+                    clientsInfo = pushSocketIdToArrayInfo(clientsInfo, id, socket.id, socket.handshake);
+                }
+                
+            
 
-            socket.broadcast.emit('user-login', clientsInfo);
+
+            // socket.emit('all-user-online', Object.keys(clients));
+
+            meeting.emit('user-login', clientsInfo);
     
-            socket.on('send-user-online', (userId) => {
-                emitNotifyToArray(clients, userId, meeting, 'reciver-user-online', clientsInfo);
-            })
+            // socket.on('send-user-online', (userId) => {
+            //     emitNotifyToArray(clients, userId, meeting, 'reciver-user-online', clientsInfo);
+            // })
     
-            // user đóng kết nối
+            // // user đóng kết nối
             socket.on("disconnect", () => {
                 socket.disconnect();
-                if (id) {
-                    clients = removeSocketIdToArray(clients, id, socket);
-                    clientsInfo = removeSocketIdToArrayInfo(clientsInfo, id, socket, socket.handshake);
-                    socket.broadcast.emit('user-logout', clientsInfo);
-                    console.log(clients);
+                clients = removeSocketIdToArray(clients, id, socket);
+                clientsInfo = removeSocketIdToArrayInfo(clientsInfo, id, socket, socket.handshake);
+                meeting.emit('user-logout', clientsInfo);
+                if (!clients[id] && id !== 0) {
+                    apis.post('ecommerce/auth/user-offline', {id_customer_oa: id});
                 }
                 
             });
