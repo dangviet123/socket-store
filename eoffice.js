@@ -65,7 +65,7 @@ const userOnlineEoffice = (io) => {
         // test gửi data
         socket.on('chat message', (msg) => {
             console.log(msg);
-            io.emit('chat message', msg);
+            io.emit('chat message', JSON.stringify(msg));
         });
     });
 }
