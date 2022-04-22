@@ -12,6 +12,7 @@ const userOnlineEoffice = (io) => {
     let clients = {};
     let clientsInfo = {};
     io.on('connection', (socket) => {
+        //console.log(socket);
         try {   
             let id = socket.handshake.query.id;
             if (id) {
@@ -63,6 +64,7 @@ const userOnlineEoffice = (io) => {
     
         // test gửi data
         socket.on('chat message', (msg) => {
+            console.log(msg);
             io.emit('chat message', msg);
         });
     });
