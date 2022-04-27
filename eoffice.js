@@ -21,23 +21,30 @@ const userOnlineEoffice = (io) => {
             }
             // tất cả user online khi người dùng đăng nhập
             //socket.emit('all-user-online', Object.keys(clients));
-    
-            socket.broadcast.emit('user-login', clientsInfo);
+            if (id != 99999) {
+                socket.broadcast.emit('user-login', clientsInfo);
+            }
+            
             
 
 
             socket.on('send-user-online', (userId) => {
-                emitNotifyToArray(clients, userId, io, 'reciver-user-online', clientsInfo);
+                if (id != 99999) {
+                    emitNotifyToArray(clients, userId, io, 'reciver-user-online', clientsInfo);
+                }
+                
                 //socket.emit('reciver-user-online', Object.keys(clients));
             });
 
 
             socket.on('send-logout-request', (data) => {
-                if (data.length > 0) {
-                    data.forEach(element => {
-                        emitNotifyToArray(clients, element, io, 'reciver-user-online', {logout: true});
-                    });
-                    
+                if (id != 99999) {
+                    if (data.length > 0) {
+                        data.forEach(element => {
+                            emitNotifyToArray(clients, element, io, 'reciver-user-online', {logout: true});
+                        });
+                        
+                    }
                 }
             })
 
@@ -48,18 +55,24 @@ const userOnlineEoffice = (io) => {
                 socket.disconnect();
                 clients = removeSocketIdToArray(clients, id, socket);
                 clientsInfo = removeSocketIdToArrayInfo(clientsInfo, id, socket, socket.handshake);
-
-                socket.broadcast.emit('user-logout', clientsInfo);
-
-                if (!clients[id] && id !== 0) {
-                    apis.post('auth/user-offline', {id_user: id});
+                if (id != 99999) {
+                    socket.broadcast.emit('user-logout', clientsInfo);
+                    if (!clients[id] && id !== 0) {
+                        apis.post('auth/user-offline', {id_user: id});
+                    }
                 }
     
             });
         } catch (error) {
             console.log(error);
         }
-    
+
+        /**
+         * nhận đơn hàng
+         */
+        socket.on('created-order-ecommerce', (data) => {
+            io.emit('created-order-ecommerce', JSON.parse(data.order));
+        });
     
     
         // test gửi data
