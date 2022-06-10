@@ -15,24 +15,25 @@ const storeSocket = (io) => {
     let clientsInfo = {};
     let meeting = io.of("/store");
     meeting.on('connection', (socket) => {
-        try {   
-                let id = socket.handshake.query.id;
-                if (id !== 0) {
-                    clients = pushSocketIdToArray(clients, id, socket.id);
-                    clientsInfo = pushSocketIdToArrayInfo(clientsInfo, id, socket.id, socket.handshake);
-                }
-                
-            
+        try {
+            let id = socket.handshake.query.id;
+            if (id !== 0) {
+                clients = pushSocketIdToArray(clients, id, socket.id);
+                clientsInfo = pushSocketIdToArrayInfo(clientsInfo, id, socket.id, socket.handshake);
+            }
 
-
-            // socket.emit('all-user-online', Object.keys(clients));
 
             meeting.emit('user-login', clientsInfo);
-    
-            // socket.on('send-user-online', (userId) => {
-            //     emitNotifyToArray(clients, userId, meeting, 'reciver-user-online', clientsInfo);
-            // })
-    
+
+
+            socket.on('send-logout-request', (data) => {
+                if (data.length > 0) {
+                    data.forEach(element => {
+                        emitNotifyToArray(clients, element, meeting, 'send-logout-request', { logout: true });
+                    });
+                }
+            });
+
             // // user đóng kết nối
             socket.on("disconnect", () => {
                 socket.disconnect();
@@ -40,9 +41,9 @@ const storeSocket = (io) => {
                 clientsInfo = removeSocketIdToArrayInfo(clientsInfo, id, socket, socket.handshake);
                 meeting.emit('user-logout', clientsInfo);
                 if (!clients[id] && id !== 0) {
-                    apis.post('ecommerce/auth/user-offline', {id_customer_oa: id});
+                    apis.post('ecommerce/auth/user-offline', { id_customer_oa: id });
                 }
-                
+
             });
         } catch (error) {
             console.log(error);
