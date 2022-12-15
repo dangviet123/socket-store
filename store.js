@@ -25,13 +25,17 @@ const storeSocket = (io) => {
 
             meeting.emit('user-login', clientsInfo);
 
-
             socket.on('send-logout-request', (data) => {
                 if (data.length > 0) {
                     data.forEach(element => {
                         emitNotifyToArray(clients, element, meeting, 'send-logout-request', { logout: true });
                     });
                 }
+            });
+
+            // gửi yêu cầu khóa hệ thống
+            socket.on('admin-lock-system', (data) => {
+                meeting.emit('admin-lock-system', {locked: true});
             });
 
             // // user đóng kết nối
@@ -43,7 +47,6 @@ const storeSocket = (io) => {
                 if (!clients[id] && id !== 0) {
                     apis.post('ecommerce/auth/user-offline', { id_customer_oa: id });
                 }
-
             });
         } catch (error) {
             console.log(error);
