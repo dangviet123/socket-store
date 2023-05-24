@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const socketioJwt = require('socketio-jwt');
 const { userOnlineEoffice } = require('./eoffice');
 const { storeSocket } = require('./store');
+const { zaloOaSocket } = require('./zaloOa');
 
 const io = sockecio(server, {
     cors: {
@@ -25,6 +26,7 @@ app.use(cors());
 
 userOnlineEoffice(io);
 storeSocket(io);
+zaloOaSocket(io);
 
 
 server.listen(3003, () => {
