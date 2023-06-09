@@ -57,7 +57,7 @@ const userOnlineEoffice = (io) => {
                 clientsInfo = removeSocketIdToArrayInfo(clientsInfo, id, socket, socket.handshake);
                 if (id != 99999) {
                     socket.broadcast.emit('user-logout', clientsInfo);
-                    if (!clients[id] && id !== 0) {
+                    if (clients && !clients[id] && id !== 0) {
                         apis.post('auth/user-offline', {id_user: id});
                     }
                 }
