@@ -19,10 +19,7 @@ const zaloOaSocket = (io) => {
             if (id !== 0) {
                 clients = pushSocketIdToArray(clients, id, socket.id);
             }
-
-
             oa.emit('user-login', clients);
-
             socket.on('send-logout-request', (data) => {
                 if (data.length > 0) {
                     data.forEach(element => {
@@ -31,34 +28,41 @@ const zaloOaSocket = (io) => {
                 }
             });
 
-
             /**
              * nhận tin nhắn zalo
              */
             socket.on('zalo-oa-message', (data) => {
                 oa.emit('zalo-oa-message', JSON.parse(data.data));
             });
+
             oa.emit('user-receive-support', userJoinRooms);
 
             socket.on('user-receive-support', (data, flag) => {
-                userJoinRooms = userJoinRooms.filter(it => it.id_user !== data.id_user);
+                userJoinRooms = userJoinRooms.filter(
+                    it => it.id_user !== data.id_user
+                );
 
                 //  room chưa thuộc người nào
-                if (userJoinRooms.filter(it => it.user_id === data.user_id && it.active === true).length === 0) {
+                if (userJoinRooms.filter(
+                    it => it.user_id === data.user_id 
+                    && it.active === true).length === 0
+                ) {
                     userJoinRooms.push({...data, active: true});
                 }else if (flag) {
-                    userJoinRooms = userJoinRooms.filter(it => it.user_id === data.user_id).map((item) => {
+                    userJoinRooms = userJoinRooms.filter(
+                        it => it.user_id === data.user_id
+                        ).map((item) => {
                         return {...item, active: false};
-                    }).concat(userJoinRooms.filter(it => it.user_id !== data.user_id));
+                    }).concat(
+                        userJoinRooms.filter(
+                            it => it.user_id !== data.user_id
+                        )
+                    );
 
                     userJoinRooms.push({...data, active: true});
                 }else {
                     userJoinRooms.push({...data, active: false});
                 }
-
-                
-
-                
                 oa.emit('user-receive-support', userJoinRooms);
             });
 
@@ -67,6 +71,17 @@ const zaloOaSocket = (io) => {
                 userJoinRooms = userJoinRooms.filter((i) => i.id_user != id);
                 oa.emit('user-receive-support', userJoinRooms);
             });
+
+
+            // người dùng gửi yêu cầu được tiếp nhận hỗ trợ
+            socket.on('user-send-confirm-support', (id,user, item) => {
+                if (clients[id] && clients[id].length > 0) {
+                    clients[id].forEach((id) => { // gửi đến từng trình duyewetj người dùng đang mở
+                        socket.to(id).emit('user-send-confirm-support',user, item);
+                    });
+                }
+            });
+
 
             // // user đóng kết nối
             socket.on("disconnect", () => {
