@@ -1,3 +1,4 @@
+const moment = require("moment/moment");
 const {
     pushSocketIdToArray,
     emitNotifyToArray,
@@ -16,7 +17,7 @@ const zaloOaSocket = (io) => {
     oa.on('connection', (socket) => {
         try {
             let id = socket.handshake.query.id;
-            if (id !== 0) {
+            if (id && id !== 0) {
                 clients = pushSocketIdToArray(clients, id, socket.id);
             }
             oa.emit('user-login', clients);
@@ -78,6 +79,74 @@ const zaloOaSocket = (io) => {
                 if (clients[id] && clients[id].length > 0) {
                     clients[id].forEach((id) => { // gửi đến từng trình duyewetj người dùng đang mở
                         socket.to(id).emit('user-send-confirm-support',user, item);
+                    });
+                }
+            });
+
+            // từ chối yêu cầu nhận hỗ trợ
+            socket.on('user-cancel-confirm-support', (user, sendId) => {
+                if (clients[sendId] && clients[sendId].length > 0) {
+                    clients[sendId].forEach((id) => { // gửi đến từng trình duyewetj người dùng đang mở
+                        socket.to(id).emit('user-cancel-confirm-support',user);
+                    });
+                }
+                // gửi sự kiện đến các tab còn lại
+                if (clients[user.id_user] && clients[user.id_user].length > 0) {
+                    clients[user.id_user].forEach((id) => { // gửi đến từng trình duyewetj người dùng đang mở
+                        socket.to(id).emit('current-cancel-confirm-support');
+                    });
+                }
+            });
+
+            socket.on('current-ok-cancel-confirm-support', reId => {
+                if (clients[reId] && clients[reId].length > 0) {
+                    clients[reId].forEach((id) => { // gửi đến từng trình duyewetj người dùng đang mở
+                        socket.to(id).emit('current-ok-cancel-confirm-support');
+                    });
+                }
+            });
+
+            // người dùng chấp nhận yêu cầu
+            socket.on('user-ok-confirm-support', (user, sendUser, item) => {
+
+                userJoinRooms = userJoinRooms.filter(
+                    it => it.user_id === item.user_id
+                    ).map((item) => {
+                    return {
+                        ...item, 
+                        active: true,
+                        id_user: sendUser.id_user,
+                        display_name: sendUser?.display_name,
+                        date: moment(),
+                        photo: sendUser?.photo
+
+                    };
+                }).concat(
+                    userJoinRooms.filter(
+                        it => it.user_id !== item.user_id
+                    )
+                );
+
+                oa.emit('user-receive-support', userJoinRooms);
+
+                if (clients[sendUser.id_user] && clients[sendUser.id_user].length > 0) {
+                    clients[sendUser.id_user].forEach((id) => { // gửi đến từng trình duyewetj người dùng đang mở
+                        socket.to(id).emit('user-ok-confirm-support',user, item);
+                    });
+                }
+
+                // gửi đến từng tab người yêu cầu
+                if (clients[user.id_user] && clients[user.id_user].length > 0) {
+                    clients[user.id_user].forEach((id) => { // gửi đến từng trình duyewetj người dùng đang mở
+                        socket.to(id).emit('current-ok-confirm-support');
+                    });
+                }
+            });
+
+            socket.on('current-ok-ok-confirm-support', reId => {
+                if (clients[reId] && clients[reId].length > 0) {
+                    clients[reId].forEach((id) => { // gửi đến từng trình duyewetj người dùng đang mở
+                        socket.to(id).emit('current-ok-ok-confirm-support');
                     });
                 }
             });
