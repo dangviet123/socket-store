@@ -73,7 +73,6 @@ const zaloOaSocket = (io) => {
                 oa.emit('user-receive-support', userJoinRooms);
             });
 
-
             // người dùng gửi yêu cầu được tiếp nhận hỗ trợ
             socket.on('user-send-confirm-support', (id,user, item) => {
                 if (clients[id] && clients[id].length > 0) {
