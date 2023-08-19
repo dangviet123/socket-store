@@ -14,6 +14,7 @@ const zaloOaSocket = (io) => {
     let userJoinRooms = []; // danh sánh người dùng vào  danh sách chat
     let clients = {};
     let oa = io.of("/zaloOa");
+    let groupRoomUsers = [];
     oa.on('connection', (socket) => {
         try {
             let id = socket.handshake.query.id;
@@ -29,6 +30,9 @@ const zaloOaSocket = (io) => {
                 }
             });
 
+            
+        
+
             /**
              * nhận tin nhắn zalo
              */
@@ -39,6 +43,9 @@ const zaloOaSocket = (io) => {
             oa.emit('user-receive-support', userJoinRooms);
 
             socket.on('user-receive-support', (data, flag) => {
+                
+                // người dùng join vào phòng chat nội bộ
+
                 userJoinRooms = userJoinRooms.filter(
                     it => it.id_user !== data.id_user
                 );
@@ -89,6 +96,7 @@ const zaloOaSocket = (io) => {
                         socket.to(id).emit('user-cancel-confirm-support',user);
                     });
                 }
+
                 // gửi sự kiện đến các tab còn lại
                 if (clients[user.id_user] && clients[user.id_user].length > 0) {
                     clients[user.id_user].forEach((id) => { // gửi đến từng trình duyewetj người dùng đang mở
@@ -149,6 +157,17 @@ const zaloOaSocket = (io) => {
                     });
                 }
             });
+
+
+            // trao đổi thông tin nội bộ group customer
+            socket.on('user-join-room-oas', (data) => {
+                
+                socket.join(data.user_id); 
+                if (data.user_id) {
+                    console.log(socket.rooms);
+                }
+            })
+
 
 
             // // user đóng kết nối
