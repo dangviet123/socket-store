@@ -152,7 +152,8 @@ const zaloOaSocket = (io) => {
 
             socket.on('current-ok-ok-confirm-support', reId => {
                 if (clients[reId] && clients[reId].length > 0) {
-                    clients[reId].forEach((id) => { // gửi đến từng trình duyewetj người dùng đang mở
+                    clients[reId].forEach((id) => {
+                        // gửi đến từng trình duyewetj người dùng đang mở
                         socket.to(id).emit('current-ok-ok-confirm-support');
                     });
                 }
@@ -162,11 +163,22 @@ const zaloOaSocket = (io) => {
             // trao đổi thông tin nội bộ group customer
             socket.on('user-join-room-oas', (data) => {
                 
-                socket.join(data.user_id); 
-                if (data.user_id) {
-                    console.log(socket.rooms);
-                }
-            })
+                socket.join(data.user_id);
+            });
+
+            // người dùng gửi tinh nhắn nộ bộ
+            socket.on('user-send-message-to-room', (message, room) => {
+                
+                socket.to(room).emit("user-send-message-to-room", message);
+            });
+
+
+            // người dùng rời khỏi phòng
+            socket.on('user-leave-room-oas', (room) => {
+                socket.leave(room);
+            });
+
+
 
 
 
