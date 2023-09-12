@@ -22,14 +22,17 @@ const storeSocket = (io) => {
                 clientsInfo = pushSocketIdToArrayInfo(clientsInfo, id, socket.id, socket.handshake);
             }
 
-
             meeting.emit('user-login', clientsInfo);
-
             socket.on('send-logout-request', (data) => {
                 if (data.length > 0) {
                     data.forEach(element => {
                         emitNotifyToArray(clients, element, meeting, 'send-logout-request', { logout: true });
                     });
+                }
+            });
+            socket.on('user-online', (userId) => {
+                if (id !== 0) {
+                    emitNotifyToArray(clients, userId, meeting, 'user-online', clientsInfo);
                 }
             });
 
