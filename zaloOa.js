@@ -55,7 +55,7 @@ const zaloOaSocket = (io) => {
                     it => it.user_id === data.user_id 
                     && it.active === true).length === 0
                 ) {
-                    userJoinRooms.push({...data, active: true});
+                    userJoinRooms.push({...data, active: flag});
                 }else if (flag) {
                     userJoinRooms = userJoinRooms.filter(
                         it => it.user_id === data.user_id
@@ -67,7 +67,7 @@ const zaloOaSocket = (io) => {
                         )
                     );
 
-                    userJoinRooms.push({...data, active: true});
+                    userJoinRooms.push({...data, active: flag});
                 }else {
                     userJoinRooms.push({...data, active: false});
                 }
